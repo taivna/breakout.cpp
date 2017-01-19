@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1484479596 source:c:\users\tavna\documents\cs211\codeblocks projects\breakout\main.cpp
+	<SDL.h>
+	<SDL_image.h>
+	<stdio.h>
+	<string>
+	<cmath>
+	<stdlib.h>
+	<time.h>
+
