@@ -1,6 +1,3 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2015)
-and may not be redistributed without written permission.*/
-
 //Using SDL, SDL_image, standard IO, and strings
 #include <SDL.h>
 #include <SDL_image.h>
@@ -17,9 +14,10 @@ const int SCREEN_WIDTH = 400;
 const int SCREEN_HEIGHT = 600;
 const int ROWS = 5;
 const int COLS = 10;
-const int MAX_POINTS = ROWS * COLS;
+const int BRICK_NUMBER = ROWS * COLS;
 
-int lives = 3, score = 0;
+int lives = 3, score = 0, brick = BRICK_NUMBER;
+
 string scoreText = "Score: ";
 string lifeText = "Lives: ";
 string msgText = "Hit UP to start/pause/resume/quit";
@@ -401,13 +399,13 @@ void Dot::move(Paddle p)
         gLifeTexture.render(320, 5);
     }
 
-    //If the dot collided or went too far up or down
+    //If the dot collided or went too far up
     if((dPosY < 0) || detectCollision(dCollider, p))
     {
         //Move back
         dPosY -= dVelY;
 		dCollider.y = dPosY;
-		dVelY = -dVelY; // bounce to the opposite direction
+		dVelY = -dVelY;        // bounce to the opposite direction
     }
 }
 
@@ -423,7 +421,6 @@ void Paddle::move()
         //Move back
         pPosX -= pVelX;
 		pCollider.x = pPosX;
-		//pVelX = -pVelX; //bounce to the opposite direction
     }
 }
 
@@ -454,7 +451,7 @@ bool init()
 	else
 	{
 		//Create window
-		gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		gWindow = SDL_CreateWindow( "Breakout", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -670,15 +667,15 @@ void initWall()
     colors[0][2] = 0;
     //orange
     colors[1][0] = 255;
-    colors[1][1] = 165;
+    colors[1][1] = 144;
     colors[1][2] = 0;
-    //yellow
-    colors[2][0] = 255;
-    colors[2][1] = 255;
-    colors[2][2] = 0;
     //green
-    colors[3][0] = 0;
-    colors[3][1] = 128;
+    colors[2][0] = 0;
+    colors[2][1] = 128;
+    colors[2][2] = 0;
+    //yellow
+    colors[3][0] = 255;
+    colors[3][1] = 255;
     colors[3][2] = 0;
     //blue
     colors[4][0] = 0;
@@ -690,7 +687,7 @@ void initWall()
         for (int col = 0; col < COLS; col++, brick_x += 40)
         {
             SDL_Rect fillRect = { brick_x, brick_y, SCREEN_WIDTH / 11, 10};
-            SDL_SetRenderDrawColor( gRenderer, colors[row][col], colors[row][col+1], colors[row][col+2], 255 );
+            SDL_SetRenderDrawColor( gRenderer, colors[row][0], colors[row][1], colors[row][2], 255 );
             SDL_RenderFillRect( gRenderer, &fillRect );
             bricks[row][col] = fillRect;
         }
@@ -710,10 +707,9 @@ bool detectCollision(SDL_Rect c, Paddle p)
     if(collided)
     {
         //play bounce sound
-        Mix_PlayChannel( -1, bounce, 0 );
+        Mix_PlayChannel(-1, bounce, 0);
         return collided;
     }
-
 
     //checking dot and wall for each brick
     for(int row = 0; row < ROWS; row++)
@@ -728,20 +724,40 @@ bool detectCollision(SDL_Rect c, Paddle p)
             if(collided)
             {
                 //play break sound
-                Mix_PlayChannel( -1, breaking, 0 );
-                //increase the score by 1 and update the score text
-                score++;
-                //concatenate score text and score
+                Mix_PlayChannel(-1, breaking, 0);
+
+                //increase the score depending on the row number
+                switch(row)
+                {
+                    case 4 :
+                        score += 1;
+                        break;
+                    case 3 :
+                        score += 2;
+                        break;
+                    case 2 :
+                        score += 3;
+                        break;
+                    case 1 :
+                        score += 4;
+                        break;
+                    case 0 :
+                        score += 5;
+                        break;
+                }
+
+                //concatenate score text and score, updating the score label
                 stringstream sstm;
                 scoreText = "Score:";
                 sstm << scoreText << score;
                 scoreText = sstm.str();
-
-                SDL_Color textColor = { 0, 0, 0 };
+                SDL_Color textColor = {0, 0, 0};
                 gScoreTexture.loadFromRenderedText(scoreText, textColor);
 
+                //destroy the collided brick
                 bricks[row][col].w = 0;
                 bricks[row][col].h = 0;
+                brick--;
                 return collided;
             }
         }
@@ -761,15 +777,15 @@ void updateWall()
     colors[0][2] = 0;
     //orange
     colors[1][0] = 255;
-    colors[1][1] = 165;
+    colors[1][1] = 144;
     colors[1][2] = 0;
     //yellow
-    colors[2][0] = 255;
-    colors[2][1] = 255;
+    colors[2][0] = 0;
+    colors[2][1] = 128;
     colors[2][2] = 0;
     //green
-    colors[3][0] = 0;
-    colors[3][1] = 128;
+    colors[3][0] = 255;
+    colors[3][1] = 255;
     colors[3][2] = 0;
     //blue
     colors[4][0] = 0;
@@ -783,7 +799,7 @@ void updateWall()
             if(bricks[row][col].w > 0 && bricks[row][col].h > 0)
             {
                 SDL_Rect fillRect = { brick_x, brick_y, SCREEN_WIDTH / 11, 10};
-                SDL_SetRenderDrawColor( gRenderer, colors[row][col], colors[row][col+1], colors[row][col+2], 255 );
+                SDL_SetRenderDrawColor( gRenderer, colors[row][0], colors[row][1], colors[row][2], 255 );
                 SDL_RenderFillRect( gRenderer, &fillRect );
             }
         }
@@ -861,7 +877,7 @@ int main(int argc, char* args[])
             }
 
 			//Main game loop
-			while(!quit && score < MAX_POINTS && lives > 0)
+			while(!quit && brick > 0 && lives > 0)
 			{
                 //Handle events on queue
 				while(SDL_PollEvent(&e1 ) != 0)
@@ -955,7 +971,7 @@ int main(int argc, char* args[])
                     }
                 }
 
-                if(score == 50)
+                if(score == 150)
                 {
                     SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     SDL_RenderClear(gRenderer);

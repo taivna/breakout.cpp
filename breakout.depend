@@ -8,3 +8,12 @@
 	<stdlib.h>
 	<time.h>
 
+1484888225 source:c:\users\tavna\documents\cs211\codeblocks projects\breakout\breakout.cpp
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_mixer.h>
+	<SDL_ttf.h>
+	<stdio.h>
+	<string>
+	<sstream>
+
