@@ -143,7 +143,7 @@ void close();
 //Box collision detector
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
-bool detectCollision(SDL_Rect c, Paddle p);
+bool handleCollision(SDL_Rect c, Paddle p);
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -347,7 +347,7 @@ void Dot::move(Paddle p)
 	dCollider.x = dPosX;
 
     //If the dot collided or went too far to the left or right
-    if((dPosX < 0) || (dPosX + DOT_WIDTH > SCREEN_WIDTH) || detectCollision(dCollider, p))
+    if((dPosX < 0) || (dPosX + DOT_WIDTH > SCREEN_WIDTH) || handleCollision(dCollider, p))
     {
         //Move back
         dPosX -= dVelX;
@@ -378,7 +378,7 @@ void Dot::move(Paddle p)
     }
 
     //If the dot collided or went too far up
-    if((dPosY < 0) || detectCollision(dCollider, p))
+    if((dPosY < 0) || handleCollision(dCollider, p))
     {
         //Move back
         dPosY -= dVelY;
@@ -676,7 +676,7 @@ void initWall()
 }
 
 //check if the dot collided with any of the bricks of the wall
-bool detectCollision(SDL_Rect c, Paddle p)
+bool handleCollision(SDL_Rect c, Paddle p)
 {
     bool collided = false;
     //checking dot and paddle collision
