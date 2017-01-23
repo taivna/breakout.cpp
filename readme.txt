@@ -1,17 +1,1 @@
-Copyright Notice:
------------------
-The files within this zip file are copyrighted by Lazy Foo' Productions (2004-2015)
-and may not be redistributed without written permission.
-
-This project is linked against:
-----------------------------------------
-Windows:
-SDL2
-SDL2main
-SDL2_image
-SDL2_ttf
-
-*nix:
-SDL2
-SDL2_image
-SDL2_ttf
+This is a simple Breakout game written in C++, using Code::Blocks IDE, SDL2 and it's extension libraries SDL2_mixer, SDL2_image, SDL2_ttf. It's based on several of Lazy Foo's tutorials, checkout his great tutorials here: http://lazyfoo.net/tutorials/SDL/index.php
